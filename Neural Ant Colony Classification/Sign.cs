@@ -10,10 +10,7 @@ namespace Neural_Ant_Colony_Classification
     {
         public static int GetSign(double number)
         {
-            if (number > 0)
-                return 1;
-            else
-                return -1;
+            return number > 0 ? 1 : -1;
         }
     }
 }

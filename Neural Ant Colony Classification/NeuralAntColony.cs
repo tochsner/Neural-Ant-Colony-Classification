@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Neural_Ant_Colony_Classification
 {
@@ -17,23 +15,8 @@ namespace Neural_Ant_Colony_Classification
         private List<OutputNeuron> outputNeurons = new List<OutputNeuron>();      
 
         public List<int> OutputSigns => outputNeurons.Select(x => x.OutputSign).ToList();                    
-        public List<double> OutputValues => outputNeurons.Select(x => x.OutputValue).ToList();        
-        public double Accuracy
-        {
-            get
-            {
-                int correct = 0;
-
-                foreach (OutputNeuron neuron in outputNeurons)
-                {
-                    if (neuron.OutputSign == neuron.ActualOutputSign)
-                        correct++;
-                }
-
-                return 1.0 * correct / outputNeurons.Count;
-            }
-
-        }
+        public List<double> OutputValues => outputNeurons.Select(x => x.OutputValue).ToList();
+        public double Accuracy => outputNeurons.Average(x => x.OutputSign == x.ActualOutputSign ? 1 : 0);
 
         public ClassificationNAC(int maxThreshold, double maxWeight, double learningRate)
         {
@@ -42,7 +25,13 @@ namespace Neural_Ant_Colony_Classification
             this.learningRate = learningRate;
         }
 
-        public void InitializeColony(int numberInputNeurons, int hiddenLayersCount, int numberHiddenNeuronsPerLayer, int numberOutputNeurons)
+        public void InitializeColony(int numberInputNeurons, int numberOutputNeurons, int hiddenLayersCount, int numberHiddenNeuronsPerLayer)
+        {
+            BuildNeurons(numberInputNeurons, numberOutputNeurons, hiddenLayersCount, numberHiddenNeuronsPerLayer);
+            ConnectNeurons();
+        }
+
+        private void BuildNeurons(int numberInputNeurons, int numberOutputNeurons, int hiddenLayersCount, int numberHiddenNeuronsPerLayer)
         {
             for (int i = 0; i < numberInputNeurons; i++)
             {
@@ -62,8 +51,6 @@ namespace Neural_Ant_Colony_Classification
             {
                 outputNeurons.Add(new OutputNeuron());
             }
-
-            ConnectNeurons();
         }
 
         private void ConnectNeurons()
@@ -124,16 +111,29 @@ namespace Neural_Ant_Colony_Classification
 
         public void RunIteration()
         {
-            RunIteration(true);
+            PrepareNeuronsForFiring();
+            FireNeurons();
+            DistributeRewards();
         }
-        public void RunIteration(bool distributeRewards)
-        {
-            // Prepare neurons to fire
 
+        public double EvaluateAccuracy(int numberIterations)
+        {
+            for (int i = 0; i < numberIterations; i++)
+            {
+                PrepareNeuronsForFiring();
+                FireNeurons();
+            }
+
+            return Accuracy;
+        }
+
+        private void PrepareNeuronsForFiring()
+        {
             foreach (INeuron inputNeuron in inputNeurons)
             {
-                inputNeuron.PrepareToFire();                
+                inputNeuron.PrepareToFire();
             }
+
             foreach (List<INeuron> layer in hiddenNeurons)
             {
                 foreach (INeuron neuron in layer)
@@ -141,16 +141,20 @@ namespace Neural_Ant_Colony_Classification
                     neuron.PrepareToFire();
                 }
             }
+
             foreach (INeuron outputNeuron in outputNeurons)
             {
                 outputNeuron.PrepareToFire();
             }
+        }
 
-            // Fire
+        private void FireNeurons()
+        {            
             foreach (INeuron inputNeuron in inputNeurons)
             {
                 inputNeuron.Fire();
             }
+
             foreach (List<INeuron> layer in hiddenNeurons)
             {
                 foreach (INeuron neuron in layer)
@@ -158,29 +162,19 @@ namespace Neural_Ant_Colony_Classification
                     neuron.Fire();
                 }
             }
+
             foreach (INeuron outputNeuron in outputNeurons)
             {
                 outputNeuron.Fire();
             }
-
-            // Distribute rewards
-            if (distributeRewards)
-            {
-                foreach (OutputNeuron neuron in outputNeurons)
-                {
-                    neuron.DistributeReward(learningRate);
-                }
-            }
         }
 
-        public double EvaluateAccuracy(int numberIterations)
+        private void DistributeRewards()
         {
-            for (int i = 0; i < numberIterations; i++)
+            foreach (OutputNeuron neuron in outputNeurons)
             {
-                RunIteration(false);
-            }
-
-            return Accuracy;
-        }
+                neuron.DistributeReward(learningRate);
+            }            
+        }      
     }
 }

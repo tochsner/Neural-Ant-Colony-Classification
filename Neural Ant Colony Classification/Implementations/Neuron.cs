@@ -6,10 +6,10 @@ namespace Neural_Ant_Colony_Classification
 {
     class Neuron : INeuron
     {
-        private static readonly Random random = new Random();
-        private static int instancesCount = 0;
-
         public int Id;
+
+        private static int instancesCount = 0;
+        private static readonly Random random = new Random();          
 
         protected List<IAnt> ants  = new List<IAnt>();
         protected List<IConnection> connections = new List<IConnection>();        

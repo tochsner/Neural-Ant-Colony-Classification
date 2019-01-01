@@ -5,6 +5,9 @@ namespace Neural_Ant_Colony_Classification
 {
     class Ant : IAnt
     {
+        public int Id;
+        private static int instancesCount = 0;
+
         private List<IConnection> History = new List<IConnection>();
 
         private int _sign = 1;
@@ -18,6 +21,12 @@ namespace Neural_Ant_Colony_Classification
                 else
                     throw new ArgumentOutOfRangeException("Sign must be either 1 or -1.");
             }
+        }
+
+        public Ant()
+        {
+            Id = instancesCount;
+            instancesCount++;
         }
 
         public void AddConnectionToHistory(IConnection connection)

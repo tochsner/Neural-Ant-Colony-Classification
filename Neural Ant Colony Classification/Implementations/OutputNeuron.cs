@@ -23,7 +23,7 @@ namespace Neural_Ant_Colony_Classification
 
         public int OutputSign => Sign.GetSign(ants.Sum(x => x.Sign));
 
-        public double OutputValue => 1.0 * ants.Where(x => x.Sign == 1).Count() / Math.Max(1, ants.Count);
+        public double OutputValue => 1.0 * ants.Where(x => x.Sign == 1).Count() / Math.Max(ants.Count, 1);
 
         public void AddAnt(IAnt ant)
         {
