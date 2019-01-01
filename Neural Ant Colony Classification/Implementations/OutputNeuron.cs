@@ -6,6 +6,8 @@ namespace Neural_Ant_Colony_Classification
 {
     class OutputNeuron : INeuron
     {
+        private List<IAnt> ants = new List<IAnt>();
+
         private int _actualOutputSign = 1;
         public int ActualOutputSign
         {
@@ -18,27 +20,19 @@ namespace Neural_Ant_Colony_Classification
                     throw new ArgumentOutOfRangeException("Sign must be either 1 or -1.");
             }
         }
-        private List<IAnt> ants = new List<IAnt>();       
 
-        public int OutputSign
-        {
-            get
-            {
-                return Sign.GetSign(ants.Sum(x => x.Sign));
-            }
-        }
+        public int OutputSign => Sign.GetSign(ants.Sum(x => x.Sign));
 
-        public double OutputValue
-        {
-            get
-            {
-                return ants.Sum(x => Math.Max(0, x.Sign)) / ants.Count;
-            }
-        }
+        public double OutputValue => 1.0 * ants.Where(x => x.Sign == 1).Count() / Math.Max(1, ants.Count);
 
         public void AddAnt(IAnt ant)
         {
-            throw new NotImplementedException();
+            ants.Add(ant);
+        }          
+        
+        public void PrepareToFire()
+        {
+            ants.Clear();
         }
 
         public void DistributeReward(double learningRate)
@@ -49,26 +43,14 @@ namespace Neural_Ant_Colony_Classification
             {
                 ant.DistributeReward(reward);
             }
-
-            ants.Clear();
-        }
-
-        public void ClearAnts()
-        {
-            ants.Clear();
-        }
-
-        public void AddNeighbour(INeuron neuron)
-        {
-        }
-
-        public void PrepareToFire()
-        {
         }
 
         public void Fire()
         {           
         }
 
+        public void AddNeighbour(INeuron neuron)
+        {
+        }
     }
 }

@@ -40,8 +40,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Implementations\Ant.cs" />
+    <Compile Include="Implementations\Connection.cs" />
+    <Compile Include="Implementations\OutputNeuron.cs" />
+    <Compile Include="Implementations\InputNeuron.cs" />
+    <Compile Include="Interfaces.cs" />
+    <Compile Include="Implementations\Neuron.cs" />
+    <Compile Include="NeuralAntColony.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sign.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

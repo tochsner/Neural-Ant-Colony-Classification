@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Neural_Ant_Colony_Classification
 {
-    class ClassificationNAC : IClassificationNeuralAntColony
+    public class ClassificationNAC : IClassificationNeuralAntColony
     {
         private int maxThreshold;
         private double maxWeight;
@@ -14,11 +14,33 @@ namespace Neural_Ant_Colony_Classification
 
         private List<InputNeuron> inputNeurons = new List<InputNeuron>();        
         private List<List<INeuron>> hiddenNeurons = new List<List<INeuron>>();
-        private List<OutputNeuron> outputNeurons = new List<OutputNeuron>();
+        private List<OutputNeuron> outputNeurons = new List<OutputNeuron>();      
 
-        public List<int> OutputSigns => throw new NotImplementedException();
-        public List<int> OutputValues => throw new NotImplementedException();
-        public double Accuracy => throw new NotImplementedException();
+        public List<int> OutputSigns => outputNeurons.Select(x => x.OutputSign).ToList();                    
+        public List<double> OutputValues => outputNeurons.Select(x => x.OutputValue).ToList();        
+        public double Accuracy
+        {
+            get
+            {
+                int correct = 0;
+
+                foreach (OutputNeuron neuron in outputNeurons)
+                {
+                    if (neuron.OutputSign == neuron.ActualOutputSign)
+                        correct++;
+                }
+
+                return 1.0 * correct / outputNeurons.Count;
+            }
+
+        }
+
+        public ClassificationNAC(int maxThreshold, double maxWeight, double learningRate)
+        {
+            this.maxThreshold = maxThreshold;
+            this.maxWeight = maxWeight;
+            this.learningRate = learningRate;
+        }
 
         public void InitializeColony(int numberInputNeurons, int hiddenLayersCount, int numberHiddenNeuronsPerLayer, int numberOutputNeurons)
         {
@@ -96,11 +118,15 @@ namespace Neural_Ant_Colony_Classification
 
             for (int i = 0; i < outputSigns.Count; i++)
             {
-                outputNeurons[i].ActualOutputSign = OutputSigns[i];
+                outputNeurons[i].ActualOutputSign = outputSigns[i];
             }
         }
 
         public void RunIteration()
+        {
+            RunIteration(true);
+        }
+        public void RunIteration(bool distributeRewards)
         {
             // Prepare neurons to fire
 
@@ -138,11 +164,23 @@ namespace Neural_Ant_Colony_Classification
             }
 
             // Distribute rewards
-
-            foreach (OutputNeuron neuron in outputNeurons)
+            if (distributeRewards)
             {
-                neuron.DistributeReward(learningRate);
+                foreach (OutputNeuron neuron in outputNeurons)
+                {
+                    neuron.DistributeReward(learningRate);
+                }
             }
+        }
+
+        public double EvaluateAccuracy(int numberIterations)
+        {
+            for (int i = 0; i < numberIterations; i++)
+            {
+                RunIteration(false);
+            }
+
+            return Accuracy;
         }
     }
 }

@@ -5,15 +5,15 @@ namespace Neural_Ant_Colony_Classification
     interface IClassificationNeuralAntColony
     { 
         void SetInputOutput(List<int> inputValues, List<int> outputSigns);
-        void RunIteration();        
+        void RunIteration();
+        double EvaluateAccuracy(int numberIterations);
         double Accuracy { get; }
         List<int> OutputSigns { get; }
-        List<int> OutputValues { get; }
+        List<double> OutputValues { get; }
     }
 
     interface INeuron
-    {
-        void ClearAnts();
+    {        
         void PrepareToFire();
         void Fire();
         void AddAnt(IAnt ant);
